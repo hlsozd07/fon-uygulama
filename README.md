@@ -10,9 +10,6 @@ Yatırımım App, yatırım portföyünüzdeki TEFAS yatırım fonlarını, BIST
 - **Güvenlik (Çevresel Değişkenler):** API yapılandırmaları güvenli bir şekilde `.env` dosyasıyla yönetilir.
 - **Portföy Geçmişi Grafiği:** Günlük toplam bakiyenizi arka planda hesaplayıp kaydederek Özet ekranında gerçekçi bir kar/zarar grafiği çıkarır.
 
-## 📸 Ekran Görüntüleri
-*(Buraya daha sonra uygulamanızın ekran görüntülerini ekleyebilirsiniz)*
-
 ## 📲 Uygulamayı İndir (APK)
 Eğer kaynak kodlarla uğraşmadan uygulamayı doğrudan Android cihazınıza kurup denemek isterseniz, derlenmiş kurulum dosyasına buradan ulaşabilirsiniz:
 
