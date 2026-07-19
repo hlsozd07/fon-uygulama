@@ -55,5 +55,3 @@ Projeyi kendi bilgisayarınızda çalıştırmak için aşağıdaki adımları t
 - **FL Chart:** Özet (Dashboard) sayfasındaki dinamik ve yumuşak portföy grafiği.
 - **Flutter Dotenv:** API ve anahtarların yönetimi.
 
-## 📜 Lisans
-Bu proje [MIT Lisansı](LICENSE) altında sunulmaktadır.
