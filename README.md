@@ -10,9 +10,6 @@ Yatırımım App, yatırım portföyünüzdeki TEFAS yatırım fonlarını, BIST
 - **Güvenlik (Çevresel Değişkenler):** API yapılandırmaları güvenli bir şekilde `.env` dosyasıyla yönetilir.
 - **Portföy Geçmişi Grafiği:** Günlük toplam bakiyenizi arka planda hesaplayıp kaydederek Özet ekranında gerçekçi bir kar/zarar grafiği çıkarır.
 
-## 📸 Ekran Görüntüleri
-*(Buraya daha sonra uygulamanızın ekran görüntülerini ekleyebilirsiniz)*
-
 ## 📲 Uygulamayı İndir (APK)
 Eğer kaynak kodlarla uğraşmadan uygulamayı doğrudan Android cihazınıza kurup denemek isterseniz, derlenmiş kurulum dosyasına buradan ulaşabilirsiniz:
 
@@ -55,5 +52,3 @@ Projeyi kendi bilgisayarınızda çalıştırmak için aşağıdaki adımları t
 - **FL Chart:** Özet (Dashboard) sayfasındaki dinamik ve yumuşak portföy grafiği.
 - **Flutter Dotenv:** API ve anahtarların yönetimi.
 
-## 📜 Lisans
-Bu proje [MIT Lisansı](LICENSE) altında sunulmaktadır.
