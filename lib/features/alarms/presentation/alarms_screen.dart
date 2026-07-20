@@ -58,7 +58,7 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
                   onPressed: () {
                     final newAlarm = AlarmModel(
                       fundCode: codeController.text.toUpperCase(),
-                      targetPrice: double.tryParse(priceController.text) ?? 0,
+                      targetPrice: double.tryParse(priceController.text.replaceAll(',', '.')) ?? 0,
                       isGreaterThan: isGreaterThan,
                     );
                     alarmBox.add(newAlarm);

@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'fund_detail_screen.dart';
 import '../../portfolio/domain/fund_model.dart';
+import '../../history/domain/sell_history_model.dart';
 import '../../tefas/data/tefas_service.dart';
 import '../../../core/widgets/gradient_card.dart';
 
@@ -54,6 +55,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final costController = TextEditingController();
     final priceController = TextEditingController();
     String selectedAssetType = 'Fon';
+    bool isFetchingPrice = false;
 
     showDialog(
       context: context,
@@ -86,10 +88,40 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         labelText: selectedAssetType == 'Döviz' ? 'Döviz Kodu (Örn: USD)' : 
                                    selectedAssetType == 'Hisse' ? 'Hisse Kodu (Örn: THYAO)' : 
                                    selectedAssetType == 'Altın' ? 'Altın Kodu (Örn: GLD)' : 'Fon Kodu (Örn: AFT)',
+                        suffixIcon: isFetchingPrice 
+                            ? const Padding(
+                                padding: EdgeInsets.all(12.0),
+                                child: SizedBox(
+                                  width: 20, 
+                                  height: 20, 
+                                  child: CircularProgressIndicator(strokeWidth: 2)
+                                ),
+                              )
+                            : IconButton(
+                                icon: const Icon(Icons.search, color: Colors.blueAccent),
+                                onPressed: () async {
+                                  if (nameController.text.trim().isEmpty) return;
+                                  setStateDialog(() => isFetchingPrice = true);
+                                  final details = await TefasService().getFundDetails(nameController.text.trim());
+                                  if (details != null && details.price > 0) {
+                                    priceController.text = details.price.toString();
+                                  } else {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Fiyat bulunamadı, varlık kodunu kontrol edin.'))
+                                      );
+                                    }
+                                  }
+                                  setStateDialog(() => isFetchingPrice = false);
+                                },
+                              ),
                       )
                     ),
+                    const SizedBox(height: 12),
                     TextField(controller: quantityController, decoration: const InputDecoration(labelText: 'Adet'), keyboardType: TextInputType.number),
+                    const SizedBox(height: 12),
                     TextField(controller: costController, decoration: const InputDecoration(labelText: 'Ortalama Maliyet'), keyboardType: TextInputType.number),
+                    const SizedBox(height: 12),
                     TextField(controller: priceController, decoration: const InputDecoration(labelText: 'Güncel Fiyat'), keyboardType: TextInputType.number),
                   ],
                 ),
@@ -99,10 +131,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 ElevatedButton(
                   onPressed: () {
                     final newFund = FundModel(
-                      name: nameController.text.toUpperCase(),
-                      quantity: double.tryParse(quantityController.text) ?? 0,
-                      averageCost: double.tryParse(costController.text) ?? 0,
-                      currentPrice: double.tryParse(priceController.text) ?? 0,
+                      name: nameController.text.trim().toUpperCase(),
+                      quantity: double.tryParse(quantityController.text.replaceAll(',', '.')) ?? 0,
+                      averageCost: double.tryParse(costController.text.replaceAll(',', '.')) ?? 0,
+                      currentPrice: double.tryParse(priceController.text.replaceAll(',', '.')) ?? 0,
                       assetType: selectedAssetType,
                     );
                     fundBox.add(newFund);
@@ -342,24 +374,29 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     
     return GestureDetector(
       onLongPress: () {
-        showDialog(
+        showModalBottomSheet(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Varlığı Sil'),
-            content: const Text('Bu varlığı portföyünüzden silmek istediğinize emin misiniz?'),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('İptal')),
-              TextButton(
-                onPressed: () {
-                  final realIndex = box.values.toList().indexOf(fund);
-                  if (realIndex != -1) {
-                    fundBox.deleteAt(realIndex);
-                  }
-                  Navigator.pop(context);
-                },
-                child: const Text('Sil', style: TextStyle(color: Colors.redAccent)),
-              ),
-            ],
+          builder: (context) => SafeArea(
+            child: Wrap(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.sell, color: Colors.greenAccent),
+                  title: const Text('Satış Yap'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showSellDialog(fund, box);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.delete, color: Colors.redAccent),
+                  title: const Text('Varlığı Sil'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showDeleteDialog(fund, box);
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -428,6 +465,109 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showDeleteDialog(FundModel fund, Box<FundModel> box) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Varlığı Sil'),
+        content: const Text('Bu varlığı portföyünüzden tamamen silmek istediğinize emin misiniz?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('İptal')),
+          TextButton(
+            onPressed: () {
+              final realIndex = box.values.toList().indexOf(fund);
+              if (realIndex != -1) {
+                fundBox.deleteAt(realIndex);
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('Sil', style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSellDialog(FundModel fund, Box<FundModel> box) {
+    final quantityController = TextEditingController(text: fund.quantity.toString());
+    final priceController = TextEditingController(text: fund.currentPrice.toString());
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('${fund.name} Satışı'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: quantityController,
+                decoration: const InputDecoration(labelText: 'Satılacak Adet'),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: priceController,
+                decoration: const InputDecoration(labelText: 'Satış Fiyatı'),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('İptal')),
+            ElevatedButton(
+              onPressed: () async {
+                final sellQuantity = double.tryParse(quantityController.text.replaceAll(',', '.')) ?? 0;
+                final sellPrice = double.tryParse(priceController.text.replaceAll(',', '.')) ?? 0;
+                
+                if (sellQuantity <= 0 || sellPrice <= 0) return;
+                
+                final realIndex = box.values.toList().indexOf(fund);
+                if (realIndex == -1) return;
+
+                final actualSellQty = sellQuantity > fund.quantity ? fund.quantity : sellQuantity;
+                final profit = (sellPrice - fund.averageCost) * actualSellQty;
+
+                // Geçmişe ekle
+                final sellBox = await Hive.openBox<SellHistoryModel>('sellHistoryBox');
+                sellBox.add(SellHistoryModel(
+                  fundName: fund.name,
+                  sellQuantity: actualSellQty,
+                  buyPrice: fund.averageCost,
+                  sellPrice: sellPrice,
+                  profit: profit,
+                  sellDate: DateTime.now(),
+                ));
+
+                // Portföyü güncelle
+                if (actualSellQty >= fund.quantity) {
+                  fundBox.deleteAt(realIndex); // Tamamını sattıysa sil
+                } else {
+                  final updatedFund = FundModel(
+                    name: fund.name,
+                    quantity: fund.quantity - actualSellQty,
+                    averageCost: fund.averageCost,
+                    currentPrice: fund.currentPrice,
+                    assetType: fund.assetType,
+                  );
+                  fundBox.putAt(realIndex, updatedFund);
+                }
+
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Satış işlemi kaydedildi.'))
+                  );
+                }
+              },
+              child: const Text('Satışı Onayla'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

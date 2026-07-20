@@ -51,12 +51,28 @@ class TefasService {
               dailyReturn = ((price - prevPrice) / prevPrice) * 100;
             }
           }
+
+          // Satış valörünü HTML sayfasından çek
+          int valor = 1; // Varsayılan olarak 1
+          try {
+            final detailUrl = Uri.parse('https://www.tefas.gov.tr/FonAnaliz.aspx?FonKod=$code');
+            final detailResponse = await http.get(detailUrl);
+            if (detailResponse.statusCode == 200) {
+              final satisRegex = RegExp(r'Fon Satış Valörü</p><p class="[^"]*">(\d+)</p>');
+              final satisMatch = satisRegex.firstMatch(detailResponse.body);
+              if (satisMatch != null) {
+                valor = int.tryParse(satisMatch.group(1) ?? '1') ?? 1;
+              }
+            }
+          } catch (e) {
+            // HTML çekimi başarısız olursa varsayılan valörde kalır
+          }
           
           return TefasFundModel(
             code: code,
             name: name,
             price: price,
-            valor: 1,
+            valor: valor,
             dailyReturn: dailyReturn,
           );
         }

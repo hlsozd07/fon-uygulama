@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:hive/hive.dart';
-import 'package:android_intent_plus/android_intent.dart';
-import 'dart:io' show Platform;
 import '../../../utils/date_calculator.dart';
 import '../../history/domain/history_model.dart';
 import '../../notifications/notification_service.dart';
@@ -243,7 +241,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           ElevatedButton.icon(
             onPressed: () async {
               final sellDate = _calculatedSellDate!;
-              final alarmTime = sellDate.subtract(const Duration(hours: 1)); // 12:30
               
               // Aynı gün saat 09:00'da bildirim
               final sameDayNotification = DateTime(sellDate.year, sellDate.month, sellDate.day, 9, 0);
@@ -265,21 +262,17 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 scheduledTime: prevDayNotification,
               );
               
-              if (Platform.isAndroid) {
-                final intent = AndroidIntent(
-                  action: 'android.intent.action.SET_ALARM',
-                  arguments: <String, dynamic>{
-                    'android.intent.extra.alarm.HOUR': alarmTime.hour,
-                    'android.intent.extra.alarm.MINUTES': alarmTime.minute,
-                    'android.intent.extra.alarm.MESSAGE': 'Fon Satış Vakti Yaklaşıyor! ⏰',
-                    'android.intent.extra.alarm.SKIP_UI': false,
-                  },
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Hatırlatıcılar başarıyla kuruldu! Satış gününden bir gün önce ve aynı gün sabah 09:00\'da bildirim alacaksınız.'),
+                    duration: Duration(seconds: 4),
+                  )
                 );
-                await intent.launch();
               }
             },
-            icon: const Icon(Icons.alarm_add),
-            label: const Text('Saat Uygulamasına Alarm Kur'),
+            icon: const Icon(Icons.notifications_active),
+            label: const Text('Uygulama İçi Hatırlatıcı Kur'),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.secondary,
               foregroundColor: Colors.white,
