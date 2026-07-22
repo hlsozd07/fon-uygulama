@@ -13,7 +13,7 @@ Yatırımım App, yatırım portföyünüzdeki TEFAS yatırım fonlarını, BIST
 ## 📲 Uygulamayı İndir (APK)
 Eğer kaynak kodlarla uğraşmadan uygulamayı doğrudan Android cihazınıza kurup denemek isterseniz, derlenmiş kurulum dosyasına buradan ulaşabilirsiniz:
 
-**[📥 Yatırımım App APK İndir (GitHub Releases)](https://github.com/KULLANICI_ADINIZ/yatirimim-app/releases)**
+**[📥 Yatırımım App APK İndir (GitHub Releases)](https://github.com/hlsozd07/fon-uygulama/releases)**
 
 *(Not: Dışarıdan APK kurarken telefonunuzda "Bilinmeyen Kaynaklara İzin Ver" seçeneğinin açık olması gerekebilir.)*
 
