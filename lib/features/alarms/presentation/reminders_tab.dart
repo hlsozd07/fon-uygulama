@@ -77,7 +77,7 @@ class _RemindersTabState extends State<RemindersTab> {
                   dayOfMonth: newReminder.dayOfMonth,
                 );
 
-                if (mounted) Navigator.pop(context);
+                if (context.mounted) Navigator.pop(context);
               },
               child: const Text('Kur'),
             ),

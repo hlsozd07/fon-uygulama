@@ -34,7 +34,7 @@ void callbackDispatcher() {
       
       final walletBox = await Hive.openBox<FundModel>('walletBox');
       final alarmBox = await Hive.openBox<AlarmModel>('alarmBox');
-      final reminderBox = await Hive.openBox<ReminderModel>('reminderBox');
+      await Hive.openBox<ReminderModel>('reminderBox');
       
       final tefasService = TefasService();
       final notificationService = NotificationService();
