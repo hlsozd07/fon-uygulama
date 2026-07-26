@@ -10,6 +10,7 @@ import 'features/portfolio/domain/fund_model.dart';
 import 'features/history/domain/history_model.dart';
 import 'features/history/domain/sell_history_model.dart';
 import 'features/alarms/domain/alarm_model.dart';
+import 'features/alarms/domain/reminder_model.dart';
 import 'features/notifications/notification_service.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -29,9 +30,11 @@ void callbackDispatcher() {
       if (!Hive.isAdapterRegistered(0)) Hive.registerAdapter(FundModelAdapter());
       if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(AlarmModelAdapter());
       if (!Hive.isAdapterRegistered(5)) Hive.registerAdapter(SellHistoryModelAdapter());
+      if (!Hive.isAdapterRegistered(6)) Hive.registerAdapter(ReminderModelAdapter());
       
       final walletBox = await Hive.openBox<FundModel>('walletBox');
       final alarmBox = await Hive.openBox<AlarmModel>('alarmBox');
+      final reminderBox = await Hive.openBox<ReminderModel>('reminderBox');
       
       final tefasService = TefasService();
       final notificationService = NotificationService();
@@ -132,11 +135,13 @@ void main() async {
   Hive.registerAdapter(AlarmModelAdapter());
   Hive.registerAdapter(PortfolioHistoryModelAdapter());
   if (!Hive.isAdapterRegistered(5)) Hive.registerAdapter(SellHistoryModelAdapter());
+  if (!Hive.isAdapterRegistered(6)) Hive.registerAdapter(ReminderModelAdapter());
   await Hive.openBox<FundModel>('walletBox');
   await Hive.openBox<HistoryModel>('historyBox');
   await Hive.openBox<AlarmModel>('alarmBox');
   await Hive.openBox<PortfolioHistoryModel>('portfolioHistoryBox');
   await Hive.openBox<SellHistoryModel>('sellHistoryBox');
+  await Hive.openBox<ReminderModel>('reminderBox');
   
   Workmanager().initialize(callbackDispatcher);
   Workmanager().registerPeriodicTask(

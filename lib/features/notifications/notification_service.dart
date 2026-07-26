@@ -63,6 +63,50 @@ class NotificationService {
         )
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
     );
+  }
+
+  Future<void> scheduleMonthlyReminder({
+    required int id,
+    required String title,
+    required String body,
+    required int dayOfMonth,
+  }) async {
+    final now = DateTime.now();
+    var scheduledDate = DateTime(now.year, now.month, dayOfMonth, 10, 0);
+
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = DateTime(now.year, now.month + 1, dayOfMonth, 10, 0);
+    }
+
+    await _notificationsPlugin.zonedSchedule(
+      id,
+      title,
+      body,
+      tz.TZDateTime.from(scheduledDate, tz.local),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'fon_reminder_channel',
+          'Yatırım Hatırlatıcıları',
+          channelDescription: 'Aylık yatırım ve birikim hatırlatıcıları',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: '@mipmap/launcher_icon',
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        )
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+    );
+  }
+
+  Future<void> cancelAlarm(int id) async {
+    await _notificationsPlugin.cancel(id);
   }
 }

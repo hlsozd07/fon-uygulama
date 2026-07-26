@@ -2,15 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../domain/alarm_model.dart';
 import '../../../core/widgets/gradient_card.dart';
+import 'reminders_tab.dart';
 
-class AlarmsScreen extends StatefulWidget {
+class AlarmsScreen extends StatelessWidget {
   const AlarmsScreen({super.key});
 
   @override
-  State<AlarmsScreen> createState() => _AlarmsScreenState();
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Alarmlar & Hatırlatıcılar', style: TextStyle(fontWeight: FontWeight.bold)),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'Fiyat Alarmları', icon: Icon(Icons.show_chart)),
+              Tab(text: 'Aylık Hatırlatıcılar', icon: Icon(Icons.calendar_month)),
+            ],
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            _PriceAlarmsTab(),
+            RemindersTab(),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _AlarmsScreenState extends State<AlarmsScreen> {
+class _PriceAlarmsTab extends StatefulWidget {
+  const _PriceAlarmsTab();
+
+  @override
+  State<_PriceAlarmsTab> createState() => _PriceAlarmsTabState();
+}
+
+class _PriceAlarmsTabState extends State<_PriceAlarmsTab> {
   late Box<AlarmModel> alarmBox;
 
   @override
@@ -77,7 +106,6 @@ class _AlarmsScreenState extends State<AlarmsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Fiyat Alarmları', style: TextStyle(fontWeight: FontWeight.bold))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _addAlarmDialog,
         icon: const Icon(Icons.add_alert),
