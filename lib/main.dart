@@ -69,16 +69,8 @@ void callbackDispatcher() {
                     scheduledTime: DateTime.now().add(const Duration(seconds: 5)),
                   );
                   // Alarmı kapat (tek seferlik çalışsın)
-                  final alarmIndex = alarmBox.values.toList().indexOf(alarm);
-                  if (alarmIndex != -1) {
-                    final updatedAlarm = AlarmModel(
-                      fundCode: alarm.fundCode,
-                      targetPrice: alarm.targetPrice,
-                      isGreaterThan: alarm.isGreaterThan,
-                      isActive: false,
-                    );
-                    await alarmBox.putAt(alarmIndex, updatedAlarm);
-                  }
+                  alarm.isActive = false;
+                  await alarm.save();
                 }
               }
             }
